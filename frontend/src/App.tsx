@@ -1,6 +1,6 @@
 import { Header } from '@codegouvfr/react-dsfr/Header'
 import { fr } from '@codegouvfr/react-dsfr'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+// import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import '@codegouvfr/react-dsfr/main.css'
 
 function App() {
