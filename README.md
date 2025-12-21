@@ -1,85 +1,60 @@
-``` mermaid
-%% Palette pâle
-%% - Couleurs très claires pour fonds/acteurs/lignes/notes
-%% - Compatible avec la plupart des parseurs Mermaid récents
-%% - Ajuste au besoin les hex ci-dessous
-%%{init: {
-  "theme": "base",
-  "themeVariables": {
-    "primaryColor": "#EAF2FF",
-    "primaryTextColor": "#1B2A4A",
-    "primaryBorderColor": "#C8DAFF",
-    "lineColor": "#CFD8E3",
-    "secondaryColor": "#F3FAF3",
-    "tertiaryColor": "#FFF5E6",
-    "noteBkgColor": "#FFFBEA",
-    "noteTextColor": "#4B4B4B",
-    "actorBkg": "#F7F9FF",
-    "actorBorder": "#E1E6F9"
-  }
-}}%%
+# Vote-Chain 
 
-sequenceDiagram
-  autonumber
+VoteChain est la plateforme de gouvernance décentralisée conçue pour couvrir l'éventail complet des besoins en vote pour les scrutins officiels.
+Il s'agit d'un projet. Ce n'est pas une plateforme officielle.
 
-  actor Citoyen as Citoyen
-  participant UI as dApp
-  participant Wallet as Wallet
-  participant FC as FranceConnect
-  participant SC1 as SC MemberPass
-  participant SC2 as SC Voting
-  participant SC3 as SC Delegation
-  participant L2 as L2 Chain
-  actor Delegue as Délégué
-  actor Audit as Auditeur
 
-  %% --- Connexion & identité ---
-  rect rgba(234,242,255,0.55)
-    Citoyen->>UI: Ouvre l'application
-    UI->>FC: Demande d'authentification
-    FC-->>UI: Jeton d'identité (assertion)
-    UI->>Wallet: Demande de signature (preuve KYC)
-    Wallet-->>UI: Signature retournée
-    UI->>SC1: Mint MemberPass (preuve + signature)
-    SC1-->>Citoyen: MemberPass émis
-  end
+## Qu'est-il possible de faire sur la plateforme ?
 
-  note over Citoyen,SC1: Le MemberPass contrôle l'accès aux scrutins
+Pour un utilisateur: 
+- Se connecter à son wallet et voir le contenu (jeton pour voter disponible ou non)
+- Voir les candidats à l'élection
+- Voter pour un candidat
+- Voir les résultats
+- (En option, déléguer son vote ?)
 
-  %% --- Création d'une proposition ---
-  rect rgba(243,250,243,0.55)
-    Citoyen->>UI: Créer une proposition
-    UI->>SC2: createProposal(titre, description, paramètres)
-    SC2-->>UI: ID de proposition
-  end
+Pour l'admin (celui qui a déployé le smart contract): 
+- Ajouter des gens à la liste éléctorale (= définir qui peut voter)
+- Ajouter des candidats (= définir pour qui on peut voter)
+- Ouvrir / Fermer une session de vote
 
-  %% --- Délégation (optionnelle) ---
-  rect rgba(255,245,230,0.55)
-    Citoyen->>SC3: delegateVote(vers Délégué)
-    SC3-->>Citoyen: Délégation enregistrée
-  end
 
-  %% --- Vote & enregistrement on-chain ---
-  rect rgba(247,249,255,0.55)
-    Citoyen->>SC2: vote(proposition, choix) 
-    Delegue->>SC2: vote délégué (si délégation)
-    SC2->>L2: Écrit événements de vote
-    L2-->>SC2: Confirmation bloc/tx
-    SC2-->>UI: État du scrutin (votes, quorum, etc.)
-  end
+## Installer le projet en local : 
 
-  %% --- Décompte & récompenses ---
-  rect rgba(255,251,234,0.55)
-    UI->>SC2: closeAndTally(proposition)
-    SC2-->>UI: Résultats finaux
-    SC2->>SC3: notifier résultats pour récompenses
-    SC3-->>Delegue: Distribution de récompenses
-  end
+### Requirements : 
+- Node 22.10 minimum
 
-  %% --- Auditabilité ---
-  rect rgba(234,242,255,0.35)
-    Audit->>L2: Lecture des événements (audit)
-    L2-->>Audit: Historique immuable
-  end
+### Tutorial :
 
-```
+- Run `cd frontend`
+- Run `npm install`
+- Run `npx hardhat compile`
+- Run `npm run dev`
+- Go to localhost:5173
+
+Si l'utilisateur utilise l'extension Metamask et qu'il est connecté, il sera automatiquement connecté à la plateforme.
+Sinon, il doit se connecter manuellement.
+
+### Tester : 
+(A destination du prochain dev)
+Les smart contracts sont rangés dans frontend/contracts (oui endroit pas logique c'est pas du frontend mais bref)
+J'ai essayé de déployer en local grâce à HardHat (https://v2.hardhat.org/hardhat-runner/docs/guides/test-contracts) 
+mais j'ai des problèmes avec les comptes de test qu'ils me génèrent et je suis même pas sûre d'avoir compris quoi en faire après de toute façon
+
+Du coup, j'ai testé le smartcontract existant sur Remix (https://remix.ethereum.org/) mais pas entre le frontend et le smart contract
+
+
+## Ce qu'il reste à faire / remarques: 
+- Faire commmuniquer le smartContract et le frontend
+- Revoir si on a besoin d'une brique FranceConnect ou si juste on affiche le logo sur le bouton et en vrai ça connecte uniquement au wallet
+- Afficher les résultats
+- Déléguer le vote à qqn d'autre (ouais on a écrit ça dans notre pitch deck)
+- Pour l'identité, on parlait de NFT dans le pitch desk, j'ai pas capté comment l'intégrer dans le projet.
+- Refaire le schema ?
+
+
+## Technologies: 
+
+Node / React / Vite / HardHat / Solidity / Système de design de l'état FR
+
+
