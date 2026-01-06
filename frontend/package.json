@@ -15,6 +15,7 @@
     "@tanstack/react-query": "^5.90.12",
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/wagmi": "^5.1.11",
+    "jspdf": "^4.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tss-react": "^4.9.20",

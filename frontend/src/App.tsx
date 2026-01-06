@@ -4,7 +4,9 @@ import {SideMenu} from '@codegouvfr/react-dsfr/SideMenu'
 import {fr} from '@codegouvfr/react-dsfr'
 import {VotingTab} from './components/VotingTab'
 import '@codegouvfr/react-dsfr/main.css'
-import {useAccount, useConnect, useDisconnect} from "wagmi";
+import VotingEngineArtifact from '../artifacts/contracts/vote-engine.sol/VotingEngine.json';
+import {useAccount, useConnect, useDisconnect, useReadContract} from "wagmi";
+import { AdminTab } from './components/AdminTab'
 
 function App() {
     const {isConnected, address} = useAccount()
@@ -14,7 +16,26 @@ function App() {
     const [activeTab, setActiveTab] = useState('profile')
 
     // Adresse du contrat déployé (TODO: à déployer, j'ai tenté un truc avec Hardhat mais pour l'instant c'est un echec, les clés qu'ils me donnent marchent pas)
-    const CONTRACT_ADDRESS = '0xtest';
+    const CONTRACT_ADDRESS = 'wallet address';
+
+
+        const {data: isAdmin} = useReadContract({
+            address: CONTRACT_ADDRESS as `0x${string}`,
+            abi: VotingEngineArtifact.abi,
+            functionName: 'isAdmin',
+            args: [address],
+            query: {
+                enabled: !!address,
+                staleTime: 0,
+                refetchOnMount: true,
+                refetchOnWindowFocus: true,
+            }
+        });
+
+        const isAdminBool = isAdmin === true;
+
+        console.log("isAdmin:", isAdmin, "address:", address);
+
 
     if (!isConnected) {
         return (
@@ -170,7 +191,18 @@ function App() {
                                         setActiveTab('vote')
                                     }
                                 }
-                            },
+                            },...(isAdminBool ? [{
+                                text: 'Admin',
+                                isActive: activeTab === 'admin',
+                                linkProps: {
+                                    href: '#',
+                                    onClick: (e) => {
+                                        e.preventDefault()
+                                        setActiveTab('admin')
+                                    }
+                                }
+                            }] : []
+                        )
                         ]}
                     />
                 </div>
@@ -192,6 +224,11 @@ function App() {
                                     </p>
                                 </div>
                             </div>
+                        )}
+                        {activeTab === 'admin' && (
+                            <AdminTab
+                                contractAddress={CONTRACT_ADDRESS}
+                            />
                         )}
                     </main>
                 </div>

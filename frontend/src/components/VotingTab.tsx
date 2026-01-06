@@ -34,12 +34,25 @@ export function VotingTab({contractAddress}: VotingTabProps) {
         args: [address!],
     })
 
+    const {data: votingFinished = false} = useReadContract({
+        address: contractAddress,
+        abi: VOTING_ENGINE_ABI,
+        functionName: 'isVotingFinished',
+    })
+
     // Changez la valeur par défaut pour tester les 2 cas sans conenxion au smartcontract
-    const {data: votingOpen = true} = useReadContract({
+    const {data: votingOpen = false} = useReadContract({
         address: contractAddress,
         abi: VOTING_ENGINE_ABI,
         functionName: 'isVotingOpen',
     })
+
+    // Récupération des candidats depuis le contrat
+    const {data: candidatesData} = useReadContract({
+        address: contractAddress,
+        abi: VOTING_ENGINE_ABI,
+        functionName: 'getAllCandidates',
+    }) as {data: Candidate[]}//mockCandidates as Candidate[]
 
     // Fonction pour voter
     const {data: hash, writeContract, isPending} = useWriteContract()
@@ -73,7 +86,8 @@ export function VotingTab({contractAddress}: VotingTabProps) {
         return <div className={fr.cx('fr-mt-4w')}>Chargement des candidats...</div>
     }
 
-    if (!votingOpen) {
+    console.log("votingOpen: " , votingOpen);
+    if (!votingOpen && !votingFinished) {
         return (
             <div className={fr.cx('fr-alert', 'fr-alert--warning', 'fr-mt-4w')}>
                 <p>Le vote n'est pas encore ouvert.</p>
@@ -110,14 +124,13 @@ export function VotingTab({contractAddress}: VotingTabProps) {
 
     //This is some workaround to give types else typescript is unhappy
     const hasAlreadyVoted = hasVoted as boolean
-    const candidatesData = mockCandidates as Candidate[]
 
 
     return (
         <div className={fr.cx('fr-mt-4w')}>
-            <h2>Liste des candidats</h2>
+            <h2>{ votingFinished ? 'Résultats du vote' : 'Liste des candidats'}</h2>
 
-            {hasAlreadyVoted && (
+            {hasAlreadyVoted && !votingFinished && (
                 <div className={fr.cx('fr-alert', 'fr-alert--success', 'fr-mb-4w')}>
                     <p>Vous avez déjà voté.</p>
                 </div>
@@ -139,7 +152,7 @@ export function VotingTab({contractAddress}: VotingTabProps) {
                                         {candidate.voteCount.toString()} vote(s)
                                     </div>
                                 </div>
-                                <div className={fr.cx('fr-card__footer')}>
+                                {!votingFinished && <div className={fr.cx('fr-card__footer')}>
                                     <button
                                         className={fr.cx('fr-btn', selectedCandidate === Number(candidate.id) ? 'fr-btn--tertiary' : 'fr-btn--secondary')}
                                         onClick={() => setSelectedCandidate(Number(candidate.id))}
@@ -147,6 +160,8 @@ export function VotingTab({contractAddress}: VotingTabProps) {
                                         {selectedCandidate === Number(candidate.id) ? 'Sélectionné' : 'Sélectionner'}
                                     </button>
                                 </div>
+                                }
+
                             </div>
                         </div>
                     </div>
