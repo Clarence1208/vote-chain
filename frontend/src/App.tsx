@@ -16,7 +16,7 @@ function App() {
     const [activeTab, setActiveTab] = useState('profile')
 
     // Adresse du contrat déployé (TODO: à déployer, j'ai tenté un truc avec Hardhat mais pour l'instant c'est un echec, les clés qu'ils me donnent marchent pas)
-    const CONTRACT_ADDRESS = 'wallet address';
+    const CONTRACT_ADDRESS = '0x962fAF0539e510EfD0140432BcDDaFb763b497a9';
 
 
         const {data: isAdmin} = useReadContract({
