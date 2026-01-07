@@ -198,4 +198,24 @@ contract VotingEngine {
     function isAdmin(address _address) external view returns (bool) {
         return _address == admin;
     }
+
+    // Structure pour les résultats d'un vote dans l'historique
+    struct VoteResult {
+        uint256 voteIndex;
+        bool isFinished;
+        Candidate[] candidates;
+    }
+
+    // Récupérer l'historique de tous les votes
+    function getHistory() external view returns (VoteResult[] memory) {
+        VoteResult[] memory results = new VoteResult[](votes.length);
+        for (uint256 i = 0; i < votes.length; i++) {
+            results[i] = VoteResult({
+                voteIndex: i,
+                isFinished: votes[i].isVotingFinished,
+                candidates: votes[i].candidates
+            });
+        }
+        return results;
+    }
 }

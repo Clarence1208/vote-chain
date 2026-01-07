@@ -7,6 +7,7 @@ import '@codegouvfr/react-dsfr/main.css'
 import VotingEngineArtifact from '../artifacts/contracts/vote-engine.sol/VotingEngine.json';
 import {useAccount, useConnect, useDisconnect, useReadContract} from "wagmi";
 import { AdminTab } from './components/AdminTab'
+import { HistoryTab } from './components/HistoryTab'
 
 function App() {
     const {isConnected, address} = useAccount()
@@ -16,7 +17,7 @@ function App() {
     const [activeTab, setActiveTab] = useState('profile')
 
     // Adresse du contrat déployé (TODO: à déployer, j'ai tenté un truc avec Hardhat mais pour l'instant c'est un echec, les clés qu'ils me donnent marchent pas)
-    const CONTRACT_ADDRESS = '0x962fAF0539e510EfD0140432BcDDaFb763b497a9';
+    const CONTRACT_ADDRESS = '0x4FA80C9738D40C5C3DE613c88D21331567D15756';
 
 
         const {data: isAdmin} = useReadContract({
@@ -191,6 +192,17 @@ function App() {
                                         setActiveTab('vote')
                                     }
                                 }
+                            },
+                            {
+                                text: 'Historique',
+                                isActive: activeTab === 'history',
+                                linkProps: {
+                                    href: '#',
+                                    onClick: (e) => {
+                                        e.preventDefault()
+                                        setActiveTab('history')
+                                    }
+                                }
                             },...(isAdminBool ? [{
                                 text: 'Admin',
                                 isActive: activeTab === 'admin',
@@ -227,6 +239,11 @@ function App() {
                         )}
                         {activeTab === 'admin' && (
                             <AdminTab
+                                contractAddress={CONTRACT_ADDRESS}
+                            />
+                        )}
+                        {activeTab === 'history' && (
+                            <HistoryTab
                                 contractAddress={CONTRACT_ADDRESS}
                             />
                         )}
